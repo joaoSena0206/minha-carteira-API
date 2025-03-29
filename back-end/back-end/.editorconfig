@@ -1,0 +1,7 @@
+# .editorconfig
+
+root = true
+
+[*.cs]
+# Desativa regras específicas
+dotnet_diagnostic.CA1707.severity = none
