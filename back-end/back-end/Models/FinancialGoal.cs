@@ -11,6 +11,6 @@ public class FinancialGoal
     public int Month { get; set; }
     public int Year { get; set; }
     
-    public required User User { get; set; }
-    public required Category Category { get; set; }
+    public User User { get; set; } = new User();
+    public Category Category { get; set; } = new Category();
 }

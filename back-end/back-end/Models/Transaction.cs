@@ -17,5 +17,5 @@ public class Transaction
     public DateTime Date { get; set; }
     
     public Category? Category { get; set; }
-    public required User User { get; set; }
+    public User User { get; set; } = new User();
 }
