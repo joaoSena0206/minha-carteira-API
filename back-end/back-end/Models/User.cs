@@ -6,9 +6,11 @@ namespace back_end.Models;
 [PrimaryKey("Username")]
 public class User
 {
+    [Required]
     [MaxLength(100)] public string Username { get; set; } = "";
 
-    [MaxLength(16)] public string Password { get; set; } = "";
+    [Required] 
+    public string Password { get; set; } = "";
     
     public ICollection<Transaction> Transactions { get; } = new List<Transaction>();
     public ICollection<Category> Categories { get; } = new List<Category>();
