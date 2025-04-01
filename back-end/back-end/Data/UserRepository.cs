@@ -1,4 +1,5 @@
 using back_end.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace back_end.Data;
 
@@ -15,5 +16,10 @@ public class UserRepository
     {
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<bool> UserExists(string username)
+    {
+        return await _context.Users.AnyAsync(u => u.Username == username);
     }
 }
