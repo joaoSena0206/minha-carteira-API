@@ -9,7 +9,7 @@ public class UserAlreadyExistsException : Exception, IHasProblemDetails
     public string? Detail { get; }
     
     public UserAlreadyExistsException(string username)
-        : base($"O usuário {username} já existe!")
+        : base($"O usuário {username} já existe")
     {
         Detail = Message;
     }

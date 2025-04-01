@@ -19,38 +19,20 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> RegisterUser(RegisterUserDto userDto)
     {
-        try
-        {
-            await _authService.RegisterUser(userDto);
+        await _authService.RegisterUser(userDto);
 
-            return StatusCode(201, new
-            {
-                message = "Usuário registrado com sucesso!",
-                username = userDto.Username
-            });
-        }
-        catch (UserAlreadyExistsException ex)
+        return StatusCode(201, new
         {
-            return Conflict(new { message = ex.Message });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = "Erro ao registrar o usuário" });
-        }
+            message = "Usuário registrado com sucesso!",
+            username = userDto.Username
+        });
     }
 
     [HttpPost("login")]
-    public IActionResult LoginUser(LoginUserDto userDto)
+    public async Task<IActionResult> LoginUser(LoginUserDto userDto)
     {
-        try
-        {
-            string token = _authService.LoginUser(userDto);
+        string tokenJwt = await _authService.LoginUser(userDto);
 
-            return Ok("Usuário logado com sucesso");
-        }
-        catch
-        {
-            return BadRequest("Erro ao logar o usuário!");
-        }
+        return Ok(new { token = tokenJwt , username = userDto.Username });
     }
 }
