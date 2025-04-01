@@ -8,15 +8,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Swashbuckle.AspNetCore.SwaggerUI;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 string? jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
+string? audience = Environment.GetEnvironmentVariable("AUDIENCE");
+string? issuer = Environment.GetEnvironmentVariable("ISSUER");
 
-if (string.IsNullOrEmpty(jwtSecret))
+if (string.IsNullOrEmpty(jwtSecret) || string.IsNullOrEmpty(audience) || string.IsNullOrEmpty(issuer))
 {
-    throw new InvalidOperationException("Secret Key do JWT não configurada");
+    throw new InvalidOperationException("Variaveis do JWT não configuradas");
 }
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -28,6 +30,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
+            ValidIssuer = "https://localhost:7283",
+            ValidAudience = "https://localhost:7283",
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret))
         };
     });
@@ -47,14 +51,44 @@ builder.Services.AddControllers()
             };
         }
     );
-builder.Services.AddOpenApi();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Insira o token JWT no formato: Bearer {seu_token}"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<TransactionRepository>();
 
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<TransactionService>();
 
 builder.Services.AddProblemDetails();
 
@@ -63,10 +97,10 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
-        options.SwaggerEndpoint("/openapi/v1.json", "v1");
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
     });
 }
 

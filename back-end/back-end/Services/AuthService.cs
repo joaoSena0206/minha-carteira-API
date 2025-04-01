@@ -15,10 +15,14 @@ public class AuthService
     private readonly UserRepository  _userRepository;
     private readonly PasswordHasher<User> _passwordHasher = new();
     private readonly string _secretKey;
+    private readonly string _issuer;
+    private readonly string _audience;
 
     public AuthService(UserRepository userRepository, IConfiguration configuration)
     {
-        _secretKey = configuration["JWT_SECRET_KEY"] ?? throw new InvalidOperationException("Secret Key do JWT não configurada");
+        _secretKey = configuration["JWT_SECRET_KEY"]!;
+        _issuer = configuration["ISSUER"]!;
+        _audience = configuration["AUDIENCE"]!;
         _userRepository = userRepository;
     }
 
@@ -74,7 +78,9 @@ public class AuthService
         {
             Subject = new ClaimsIdentity(claims),
             Expires = DateTime.UtcNow.AddDays(1),
-            SigningCredentials = credentials
+            SigningCredentials = credentials,
+            Issuer = _issuer,
+            Audience = _audience
         };
 
         var tokenHandler = new JsonWebTokenHandler();

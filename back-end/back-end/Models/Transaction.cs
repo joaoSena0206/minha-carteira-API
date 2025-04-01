@@ -20,6 +20,11 @@ public class Transaction
     [Required]
     public DateTime Date { get; set; }
     
+    public int? CategoryId { get; set; }
+    public string Username { get; set; } = "";
+    
     public Category? Category { get; set; }
-    public User User { get; set; } = new User();
+    
+    [ForeignKey("Username")]
+    public User? User { get; set; }
 }
