@@ -1,5 +1,7 @@
 using back_end.Data;
+using back_end.Interfaces;
 using back_end.Services;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +32,8 @@ builder.Services.AddScoped<UserRepository>();
 
 builder.Services.AddScoped<AuthService>();
 
+builder.Services.AddProblemDetails();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -43,6 +47,41 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseStatusCodePages();
+
+app.UseExceptionHandler(appError =>
+{
+    appError.Run(async context =>
+    {
+        var feature = context.Features.Get<IExceptionHandlerFeature>();
+        var exception = feature?.Error;
+        
+        var traceId = context.TraceIdentifier;
+        var path = context.Request.Path;
+        var method = context.Request.Method;
+
+        var problem = new ProblemDetails
+        {
+            Instance = $"{method} {path}",
+            Status = StatusCodes.Status500InternalServerError,
+            Title = "Erro interno do servidor"
+        };
+
+        if (exception is IHasProblemDetails detailedException)
+        {
+            problem.Status = detailedException.StatusCode;
+            problem.Title = detailedException.Title;
+            problem.Detail = detailedException.Detail;
+        }
+        
+        problem.Extensions["traceId"] = traceId;
+        
+        context.Response.StatusCode = problem.Status ?? 500;
+        context.Response.ContentType = "application/problem+json";
+        await context.Response.WriteAsJsonAsync(problem);
+    });
+});
 
 app.UseAuthorization();
 
