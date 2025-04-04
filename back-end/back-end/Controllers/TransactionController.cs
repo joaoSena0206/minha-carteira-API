@@ -1,5 +1,7 @@
+using System.Runtime.InteropServices.JavaScript;
 using System.Security.Claims;
 using back_end.DTOs;
+using back_end.Models;
 using back_end.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +17,16 @@ public class TransactionController : ControllerBase
     public TransactionController(TransactionService transactionService)
     {
         _transactionService = transactionService;
+    }
+
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> GetTransactions([FromQuery] FilterTransactionDto filterTransactionDto)
+    {
+        string username = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var transactions = await _transactionService.GetTransactions(username, filterTransactionDto);
+        
+        return Ok(transactions);
     }
     
     [HttpPost]

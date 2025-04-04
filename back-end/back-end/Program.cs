@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text;
 using back_end.Configurations;
 using back_end.Data;
@@ -29,14 +30,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidIssuer = jwtSettings?.Issuer,
             ValidAudience = jwtSettings?.Audience,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings?.SecretKey))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings?.SecretKey!))
         };
         
         options.Events = new JwtBearerEvents
         {
             OnTokenValidated = async context =>
             {
-                var username = context.Principal?.FindFirst("sub")?.Value;
+                var username = context.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 
                 var db = context.HttpContext.RequestServices.GetRequiredService<ApplicationDbContext>();
 

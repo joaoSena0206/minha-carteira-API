@@ -27,4 +27,14 @@ public class TransactionService
         
         return await _transactionRepository.AddTransaction(transaction);
     }
+
+    public async Task<IList<Transaction>> GetTransactions(string username, FilterTransactionDto filterTransactionDto)
+    {
+        return await  _transactionRepository.GetTransactions(
+            username,
+            filterTransactionDto.StartDate,
+            filterTransactionDto.EndDate,
+            filterTransactionDto.IsCredit,
+            filterTransactionDto.CategoryId);
+    }
 }

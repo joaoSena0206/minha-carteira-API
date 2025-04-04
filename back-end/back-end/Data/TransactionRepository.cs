@@ -1,4 +1,6 @@
+using back_end.DTOs;
 using back_end.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace back_end.Data;
 
@@ -9,6 +11,40 @@ public class TransactionRepository
     public TransactionRepository(ApplicationDbContext context)
     {
         _context = context;
+    }
+
+    public async Task<IList<Transaction>> GetTransactions(
+        string username,
+        DateTime? startDate,
+        DateTime? endDate,
+        bool? isCredit,
+        int? categoryId)
+    {
+        var query = _context.Transactions
+            .Where(t => t.Username == username)
+            .AsQueryable();
+
+        if (startDate != null)
+        {
+            query = query.Where(t => t.Date >= startDate);
+        }
+
+        if (endDate != null)
+        {
+            query = query.Where(t => t.Date <= endDate);
+        }
+
+        if (isCredit != null)
+        {
+            query = query.Where(t => t.IsCredit == isCredit);
+        }
+
+        if (categoryId != null)
+        {
+            query = query.Where(t => t.CategoryId == categoryId);
+        }
+
+        return await query.ToListAsync();
     }
 
     public async Task<int> AddTransaction(Transaction transaction)
