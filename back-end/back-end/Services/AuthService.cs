@@ -1,10 +1,12 @@
 using System.Security.Claims;
 using System.Text;
+using back_end.Configurations;
 using back_end.Data;
 using back_end.DTOs;
 using back_end.Exceptions;
 using back_end.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
@@ -14,15 +16,11 @@ public class AuthService
 {
     private readonly UserRepository  _userRepository;
     private readonly PasswordHasher<User> _passwordHasher = new();
-    private readonly string _secretKey;
-    private readonly string _issuer;
-    private readonly string _audience;
+    private readonly JwtSettings _jwtSettings;
 
-    public AuthService(UserRepository userRepository, IConfiguration configuration)
+    public AuthService(UserRepository userRepository, IOptions<JwtSettings> jwtSettings)
     {
-        _secretKey = configuration["JWT_SECRET_KEY"]!;
-        _issuer = configuration["ISSUER"]!;
-        _audience = configuration["AUDIENCE"]!;
+        _jwtSettings = jwtSettings.Value;
         _userRepository = userRepository;
     }
 
@@ -65,7 +63,7 @@ public class AuthService
     
     private string GenerateToken(string username)
     {
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
         var claims = new[]
@@ -79,8 +77,8 @@ public class AuthService
             Subject = new ClaimsIdentity(claims),
             Expires = DateTime.UtcNow.AddDays(1),
             SigningCredentials = credentials,
-            Issuer = _issuer,
-            Audience = _audience
+            Issuer = _jwtSettings.Issuer,
+            Audience = _jwtSettings.Audience
         };
 
         var tokenHandler = new JsonWebTokenHandler();
