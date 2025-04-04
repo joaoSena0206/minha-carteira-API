@@ -1,5 +1,7 @@
 using System.Text;
+using back_end.Configurations;
 using back_end.Data;
+using back_end.Exceptions;
 using back_end.Interfaces;
 using back_end.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -12,14 +14,9 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-string? jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
-string? audience = Environment.GetEnvironmentVariable("AUDIENCE");
-string? issuer = Environment.GetEnvironmentVariable("ISSUER");
+var jwtSettings = builder.Configuration.GetSection("JWT").Get<JwtSettings>();
 
-if (string.IsNullOrEmpty(jwtSecret) || string.IsNullOrEmpty(audience) || string.IsNullOrEmpty(issuer))
-{
-    throw new InvalidOperationException("Variaveis do JWT não configuradas");
-}
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JWT"));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -30,9 +27,26 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = "https://localhost:7283",
-            ValidAudience = "https://localhost:7283",
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret))
+            ValidIssuer = jwtSettings?.Issuer,
+            ValidAudience = jwtSettings?.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings?.SecretKey))
+        };
+        
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async context =>
+            {
+                var username = context.Principal?.FindFirst("sub")?.Value;
+                
+                var db = context.HttpContext.RequestServices.GetRequiredService<ApplicationDbContext>();
+
+                var userStillExists = await db.Users.AnyAsync(u => u.Username == username);
+
+                if (!userStillExists)
+                {
+                    throw new InvalidJwtToken();
+                }
+            }
         };
     });
 
@@ -89,6 +103,7 @@ builder.Services.AddScoped<TransactionRepository>();
 
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<TransactionService>();
+builder.Services.AddScoped<UserService>();
 
 builder.Services.AddProblemDetails();
 
