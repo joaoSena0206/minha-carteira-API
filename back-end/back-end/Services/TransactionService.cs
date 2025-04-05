@@ -28,6 +28,13 @@ public class TransactionService
         return await _transactionRepository.AddTransaction(transaction);
     }
 
+    public async Task<decimal> GetBalance(string username)
+    {
+        decimal balance = await _transactionRepository.GetBalance(username);
+        
+        return balance;
+    }
+
     public async Task<IList<Transaction>> GetTransactions(string username, FilterTransactionDto filterTransactionDto)
     {
         return await  _transactionRepository.GetTransactions(

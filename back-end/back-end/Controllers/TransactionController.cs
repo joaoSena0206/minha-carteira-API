@@ -28,6 +28,16 @@ public class TransactionController : ControllerBase
         
         return Ok(transactions);
     }
+
+    [HttpGet("balance")]
+    [Authorize]
+    public async Task<IActionResult> GetBalance()
+    {
+        string username = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        decimal balance = await _transactionService.GetBalance(username);
+        
+        return Ok(balance);
+    }
     
     [HttpPost]
     [Authorize]

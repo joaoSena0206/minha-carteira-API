@@ -54,4 +54,15 @@ public class TransactionRepository
         
         return transaction.Id;
     }
+
+    public async Task<decimal> GetBalance(string username)
+    {
+        List<Transaction> transactions = await _context.Transactions
+            .Where(t => t.Username == username)
+            .ToListAsync();
+        
+        decimal balance = transactions.Sum(t => t.IsCredit ? t.Value : -t.Value);
+
+        return balance;
+    }
 }
