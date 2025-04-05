@@ -48,4 +48,15 @@ public class TransactionController : ControllerBase
         
         return StatusCode(201, new { message = "Transação adicionada com sucesso!", transactionId = transactionId });
     }
+
+    [HttpPatch("{id:int}")]
+    [Authorize]
+    public async Task<IActionResult> UpdateTransaction(int id, UpdateTransactionDto transactionDto)
+    {
+        string username = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        
+        await _transactionService.UpdateTransaction(transactionDto, username, id);
+        
+        return NoContent();
+    }
 }

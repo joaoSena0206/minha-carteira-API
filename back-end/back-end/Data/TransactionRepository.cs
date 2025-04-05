@@ -65,4 +65,15 @@ public class TransactionRepository
 
         return balance;
     }
+
+    public async Task<Transaction> GetTransaction(int transactionId, string username)
+    {
+        return await _context.Transactions
+            .FirstOrDefaultAsync(t => t.Id == transactionId && t.Username == username);
+    }
+
+    public async Task SaveChanges()
+    {
+        await _context.SaveChangesAsync();
+    }
 }
