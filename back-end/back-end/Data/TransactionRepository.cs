@@ -76,4 +76,10 @@ public class TransactionRepository
     {
         await _context.SaveChangesAsync();
     }
+
+    public async Task DeleteTransaction(Transaction transaction)
+    {
+        _context.Remove(transaction);
+        await _context.SaveChangesAsync();
+    }
 }

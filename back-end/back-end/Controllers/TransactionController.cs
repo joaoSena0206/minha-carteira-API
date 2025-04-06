@@ -59,4 +59,15 @@ public class TransactionController : ControllerBase
         
         return NoContent();
     }
+
+    [HttpDelete("{id:int}")]
+    [Authorize]
+    public async Task<IActionResult> DeleteTransaction(int id)
+    {
+        string username = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        
+        await _transactionService.DeleteTransaction(id, username);
+        
+        return NoContent();
+    }
 }

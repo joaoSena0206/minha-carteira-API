@@ -63,4 +63,16 @@ public class TransactionService
 
        await _transactionRepository.SaveChanges();
     }
+
+    public async Task DeleteTransaction(int transactionId, string username)
+    {
+        Transaction transaction = await _transactionRepository.GetTransaction(transactionId, username);
+
+        if (transaction == null)
+        {
+            throw new NotFoundTransaction(transactionId);
+        }
+        
+        await _transactionRepository.DeleteTransaction(transaction);
+    }
 }
