@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace back_end.Models;
 
@@ -10,6 +11,9 @@ public class Category
     [MaxLength(100)] 
     public string Name { get; set; } = "";
     
-    public User User { get; set; } = new User();
+    public string Username { get; set; } = "";
+    
+    [ForeignKey("Username")]
+    public User? User { get; set; }
     public ICollection<FinancialGoal> FinancialGoals { get; set; } = new List<FinancialGoal>();
 }

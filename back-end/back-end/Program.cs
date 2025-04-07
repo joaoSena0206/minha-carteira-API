@@ -101,10 +101,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<TransactionRepository>();
+builder.Services.AddScoped<CategoryRepository>();
 
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<TransactionService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<CategoryService>();
 
 builder.Services.AddProblemDetails();
 

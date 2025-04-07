@@ -18,10 +18,6 @@ public class ApplicationDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
-        modelBuilder.Entity<Category>()
-            .HasOne(c => c.User)
-            .WithMany(u => u.Categories)
-            .OnDelete(DeleteBehavior.Restrict);
+        
     }
 }
