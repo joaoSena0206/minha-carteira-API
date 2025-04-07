@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace back_end.Models;
 
@@ -20,11 +21,8 @@ public class Transaction
     [Required]
     public DateTime Date { get; set; }
     
-    public int? CategoryId { get; set; }
-    public string Username { get; set; } = "";
-    
     public Category? Category { get; set; }
     
-    [ForeignKey("Username")]
+    [JsonIgnore]
     public User? User { get; set; }
 }

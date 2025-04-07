@@ -20,11 +20,21 @@ public class CategoryController : ControllerBase
 
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> Post(AddCategoryDto categoryDto)
+    public async Task<IActionResult> AddTransaction(AddCategoryDto categoryDto)
     {
         string username = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         int categoryId = await _categoryService.AddCategory(categoryDto, username);
 
         return StatusCode(201, new { categoryId = categoryId });
+    }
+
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> GetCategories()
+    {
+        string username = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        List<Category> categories = await _categoryService.GetCategories(username);
+        
+        return Ok(categories);
     }
 }

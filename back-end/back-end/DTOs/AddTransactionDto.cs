@@ -18,6 +18,6 @@ public class AddTransactionDto
     
     [Required(ErrorMessage = "Data da transação obrigatória!")]
     public DateTime Date { get; set; }
-    
+
     public int CategoryId { get; set; }
 }

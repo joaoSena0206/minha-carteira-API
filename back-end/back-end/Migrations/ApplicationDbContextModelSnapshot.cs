@@ -36,7 +36,6 @@ namespace back_end.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Username")
-                        .IsRequired()
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
@@ -100,7 +99,6 @@ namespace back_end.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Username")
-                        .IsRequired()
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<decimal>("Value")
@@ -135,8 +133,7 @@ namespace back_end.Migrations
                     b.HasOne("back_end.Models.User", "User")
                         .WithMany("Categories")
                         .HasForeignKey("Username")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("User");
                 });
@@ -161,14 +158,14 @@ namespace back_end.Migrations
             modelBuilder.Entity("back_end.Models.Transaction", b =>
                 {
                     b.HasOne("back_end.Models.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId");
+                        .WithMany("Transactions")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("back_end.Models.User", "User")
                         .WithMany("Transactions")
                         .HasForeignKey("Username")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Category");
 
@@ -178,6 +175,8 @@ namespace back_end.Migrations
             modelBuilder.Entity("back_end.Models.Category", b =>
                 {
                     b.Navigation("FinancialGoals");
+
+                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("back_end.Models.User", b =>

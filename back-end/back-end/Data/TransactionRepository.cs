@@ -21,7 +21,8 @@ public class TransactionRepository
         int? categoryId)
     {
         var query = _context.Transactions
-            .Where(t => t.Username == username)
+            .Where(t => t.User.Username == username)
+            .Include(t => t.Category)
             .AsQueryable();
 
         if (startDate != null)
@@ -41,7 +42,7 @@ public class TransactionRepository
 
         if (categoryId != null)
         {
-            query = query.Where(t => t.CategoryId == categoryId);
+            query = query.Where(t => t.Category.Id == categoryId);
         }
 
         return await query.ToListAsync();
@@ -58,7 +59,7 @@ public class TransactionRepository
     public async Task<decimal> GetBalance(string username)
     {
         List<Transaction> transactions = await _context.Transactions
-            .Where(t => t.Username == username)
+            .Where(t => t.User.Username == username)
             .ToListAsync();
         
         decimal balance = transactions.Sum(t => t.IsCredit ? t.Value : -t.Value);
@@ -69,7 +70,7 @@ public class TransactionRepository
     public async Task<Transaction> GetTransaction(int transactionId, string username)
     {
         return await _context.Transactions
-            .FirstOrDefaultAsync(t => t.Id == transactionId && t.Username == username);
+            .FirstOrDefaultAsync(t => t.Id == transactionId && t.User.Username == username);
     }
 
     public async Task SaveChanges()

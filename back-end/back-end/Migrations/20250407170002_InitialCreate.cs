@@ -15,15 +15,12 @@ namespace back_end.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
                     Username = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: false),
-                    PreferredCurrency = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false)
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_Users", x => x.Username);
                 });
 
             migrationBuilder.CreateTable(
@@ -33,17 +30,16 @@ namespace back_end.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    Username = table.Column<string>(type: "nvarchar(100)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categories", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Categories_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_Categories_Users_Username",
+                        column: x => x.Username,
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Username");
                 });
 
             migrationBuilder.CreateTable(
@@ -55,7 +51,7 @@ namespace back_end.Migrations
                     ValueLimit = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Month = table.Column<int>(type: "int", nullable: false),
                     Year = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Username = table.Column<string>(type: "nvarchar(100)", nullable: true),
                     CategoryId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -68,11 +64,10 @@ namespace back_end.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_FinancialGoals_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_FinancialGoals_Users_Username",
+                        column: x => x.Username,
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Username");
                 });
 
             migrationBuilder.CreateTable(
@@ -82,11 +77,11 @@ namespace back_end.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Value = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     IsCredit = table.Column<bool>(type: "bit", nullable: false),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    CategoryId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    CategoryId = table.Column<int>(type: "int", nullable: true),
+                    Username = table.Column<string>(type: "nvarchar(100)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -95,20 +90,18 @@ namespace back_end.Migrations
                         name: "FK_Transactions_Categories_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "Categories",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Transactions_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_Transactions_Users_Username",
+                        column: x => x.Username,
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Username");
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Categories_UserId",
+                name: "IX_Categories_Username",
                 table: "Categories",
-                column: "UserId");
+                column: "Username");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FinancialGoals_CategoryId",
@@ -116,9 +109,9 @@ namespace back_end.Migrations
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FinancialGoals_UserId",
+                name: "IX_FinancialGoals_Username",
                 table: "FinancialGoals",
-                column: "UserId");
+                column: "Username");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Transactions_CategoryId",
@@ -126,9 +119,9 @@ namespace back_end.Migrations
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Transactions_UserId",
+                name: "IX_Transactions_Username",
                 table: "Transactions",
-                column: "UserId");
+                column: "Username");
         }
 
         /// <inheritdoc />

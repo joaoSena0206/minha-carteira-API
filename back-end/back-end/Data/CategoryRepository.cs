@@ -1,5 +1,6 @@
 using back_end.DTOs;
 using back_end.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace back_end.Data;
 
@@ -18,5 +19,19 @@ public class CategoryRepository
         await _context.SaveChangesAsync();
         
         return category.Id;
+    }
+
+    public async Task<Category> GetCategory(int id, string username)
+    {
+        return await _context.Categories.SingleOrDefaultAsync(c => c.Id == id && c.User.Username == username);
+    }
+
+    public async Task<List<Category>> GetCategories(string username)
+    {
+        List<Category> categories = await _context.Categories
+            .Where(c => c.User.Username == username)
+            .ToListAsync();
+
+        return categories;
     }
 }

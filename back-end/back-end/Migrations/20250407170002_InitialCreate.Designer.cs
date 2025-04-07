@@ -12,8 +12,8 @@ using back_end.Data;
 namespace back_end.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250331203340_RemoveRequiredModels")]
-    partial class RemoveRequiredModels
+    [Migration("20250407170002_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,7 +39,6 @@ namespace back_end.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Username")
-                        .IsRequired()
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
@@ -125,8 +124,7 @@ namespace back_end.Migrations
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasMaxLength(16)
-                        .HasColumnType("nvarchar(16)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Username");
 
@@ -137,9 +135,7 @@ namespace back_end.Migrations
                 {
                     b.HasOne("back_end.Models.User", "User")
                         .WithMany("Categories")
-                        .HasForeignKey("Username")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("Username");
 
                     b.Navigation("User");
                 });
@@ -164,7 +160,7 @@ namespace back_end.Migrations
             modelBuilder.Entity("back_end.Models.Transaction", b =>
                 {
                     b.HasOne("back_end.Models.Category", "Category")
-                        .WithMany()
+                        .WithMany("Transactions")
                         .HasForeignKey("CategoryId");
 
                     b.HasOne("back_end.Models.User", "User")
@@ -179,6 +175,8 @@ namespace back_end.Migrations
             modelBuilder.Entity("back_end.Models.Category", b =>
                 {
                     b.Navigation("FinancialGoals");
+
+                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("back_end.Models.User", b =>

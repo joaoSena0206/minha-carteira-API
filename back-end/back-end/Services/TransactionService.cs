@@ -8,10 +8,17 @@ namespace back_end.Services;
 public class TransactionService
 {
     private readonly TransactionRepository _transactionRepository;
+    private readonly UserRepository _userRepository;
+    private readonly CategoryRepository _categoryRepository;
 
-    public TransactionService(TransactionRepository transactionRepository)
+    public TransactionService(
+        TransactionRepository transactionRepository,
+        UserRepository userRepository,
+        CategoryRepository categoryRepository)
     {
         _transactionRepository = transactionRepository;
+        _userRepository = userRepository;
+        _categoryRepository = categoryRepository;
     }
 
     public async Task<int> AddTransaction(AddTransactionDto transactionDto, string username)
@@ -22,8 +29,9 @@ public class TransactionService
             Description = transactionDto.Description,
             IsCredit = transactionDto.IsCredit,
             Date  = transactionDto.Date,
-            CategoryId = transactionDto.CategoryId == 0 ? null : transactionDto.CategoryId,
-            Username = username
+            User = await _userRepository.GetUser(username),
+            Category = transactionDto.CategoryId != 0 ? await _categoryRepository.GetCategory(transactionDto.CategoryId, username) ??
+                       throw new NotFoundCategoryException(transactionDto.CategoryId) : null
         };
         
         return await _transactionRepository.AddTransaction(transaction);
@@ -59,7 +67,10 @@ public class TransactionService
        transaction.Description = transactionDto.Description ?? transaction.Description;
        transaction.IsCredit = transactionDto.IsCredit ?? transaction.IsCredit;
        transaction.Date = transactionDto.Date ?? transaction.Date;
-       transaction.CategoryId = transactionDto.CategoryId ?? transaction.CategoryId;
+       transaction.Category = transactionDto.CategoryId != 0 && transactionDto.CategoryId != null
+           ? await _categoryRepository.GetCategory((int)transactionDto.CategoryId, username) ??
+             throw new NotFoundCategoryException((int)transactionDto.CategoryId)
+           : null;
 
        await _transactionRepository.SaveChanges();
     }

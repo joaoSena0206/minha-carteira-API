@@ -25,7 +25,7 @@ public class UserRepository
 
     public async Task<User?> GetUser(string username)
     {
-        return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+        return await _context.Users.FindAsync(username);
     }
 
     public async Task DeleteUser(string username)
