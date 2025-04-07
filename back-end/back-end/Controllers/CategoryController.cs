@@ -37,4 +37,15 @@ public class CategoryController : ControllerBase
         
         return Ok(categories);
     }
+
+    [HttpPatch("{id:int}")]
+    [Authorize]
+    public async Task<IActionResult> UpdateCategory(int id, UpdateCategoryDto categoryDto)
+    {
+        string username = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        
+        await  _categoryService.UpdateCategory(id, categoryDto, username);
+        
+        return NoContent();
+    }
 }

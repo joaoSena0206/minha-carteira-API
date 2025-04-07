@@ -34,4 +34,9 @@ public class CategoryRepository
 
         return categories;
     }
+
+    public async Task SaveChanges()
+    {
+        await _context.SaveChangesAsync();
+    }
 }
