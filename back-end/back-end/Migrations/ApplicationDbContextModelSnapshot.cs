@@ -42,7 +42,7 @@ namespace back_end.Migrations
 
                     b.HasIndex("Username");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("back_end.Models.FinancialGoal", b =>
@@ -74,7 +74,7 @@ namespace back_end.Migrations
 
                     b.HasIndex("Username");
 
-                    b.ToTable("FinancialGoals");
+                    b.ToTable("FinancialGoals", (string)null);
                 });
 
             modelBuilder.Entity("back_end.Models.Transaction", b =>
@@ -110,7 +110,7 @@ namespace back_end.Migrations
 
                     b.HasIndex("Username");
 
-                    b.ToTable("Transactions");
+                    b.ToTable("Transactions", (string)null);
                 });
 
             modelBuilder.Entity("back_end.Models.User", b =>
@@ -125,7 +125,7 @@ namespace back_end.Migrations
 
                     b.HasKey("Username");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("back_end.Models.Category", b =>

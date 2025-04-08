@@ -48,4 +48,15 @@ public class CategoryController : ControllerBase
         
         return NoContent();
     }
+
+    [HttpDelete("{id:int}")]
+    [Authorize]
+    public async Task<IActionResult> DeleteCategory(int id)
+    {
+        string username = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        
+        await _categoryService.DeleteCategory(id, username);
+        
+        return NoContent();
+    }
 }

@@ -83,4 +83,11 @@ public class TransactionRepository
         _context.Remove(transaction);
         await _context.SaveChangesAsync();
     }
+    
+    public async Task<List<Transaction>> GetCategoryTransactions(string username, int categoryId)
+    {
+        return await _context.Transactions
+            .Where(t => t.User.Username == username && t.Category.Id == categoryId)
+            .ToListAsync();
+    }
 }
