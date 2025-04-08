@@ -60,4 +60,16 @@ public class FinancialGoalService
 
         await _financialGoalRepository.SaveChanges();
     }
+
+    public async Task Delete(int id, string username)
+    {
+        FinancialGoal financialGoal = await _financialGoalRepository.GetById(id, username);
+
+        if (financialGoal == null)
+        {
+            throw new NotFoundFinancialGoalException(id);
+        }
+        
+        await _financialGoalRepository.Delete(financialGoal);
+    }
 }

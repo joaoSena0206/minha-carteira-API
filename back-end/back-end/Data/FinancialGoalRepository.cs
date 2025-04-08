@@ -50,4 +50,10 @@ public class FinancialGoalRepository
     {
         await _context.SaveChangesAsync();
     }
+
+    public async Task Delete(FinancialGoal financialGoal)
+    {
+        _context.FinancialGoals.Remove(financialGoal);
+        await _context.SaveChangesAsync();
+    }
 }

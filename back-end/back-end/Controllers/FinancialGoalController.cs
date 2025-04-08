@@ -48,4 +48,15 @@ public class FinancialGoalController : ControllerBase
         
         return NoContent();
     }
+
+    [HttpDelete("{id:int}")]
+    [Authorize]
+    public async Task<IActionResult> Delete(int id)
+    {
+        string username = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        
+        await _financialGoalService.Delete(id, username);
+        
+        return NoContent();
+    }
 }
