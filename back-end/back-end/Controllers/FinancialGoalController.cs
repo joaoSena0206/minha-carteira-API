@@ -37,4 +37,15 @@ public class FinancialGoalController : ControllerBase
         
         return Ok(financialGoals);
     }
+
+    [HttpPatch("{id:int}")]
+    [Authorize]
+    public async Task<IActionResult> Update(int id, UpdateFinancialGoalDto financialGoalDto)
+    {
+        string username = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        
+        await _financialGoalService.Update(financialGoalDto, username, id);
+        
+        return NoContent();
+    }
 }

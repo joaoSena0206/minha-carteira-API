@@ -40,4 +40,24 @@ public class FinancialGoalService
     {
         return await _financialGoalRepository.GetAll(month, year, username);
     }
+
+    public async Task Update(UpdateFinancialGoalDto financialGoalDto, string username, int id)
+    {
+        FinancialGoal financialGoal = await _financialGoalRepository.GetById(id, username);
+
+        if (financialGoal == null)
+        {
+            throw new NotFoundFinancialGoalException(id);
+        }
+        
+        financialGoal.ValueLimit = financialGoalDto.ValueLimit ?? financialGoal.ValueLimit;
+        financialGoal.Month = financialGoalDto.Month ?? financialGoal.Month;
+        financialGoal.Year = financialGoalDto.Year ?? financialGoal.Year;
+        financialGoal.Category = financialGoalDto.CategoryId != null ?
+            await _categoryRepository.GetCategory((int)financialGoalDto.CategoryId, username)
+            ?? throw new NotFoundCategoryException((int)financialGoalDto.CategoryId)
+            : financialGoal.Category;
+
+        await _financialGoalRepository.SaveChanges();
+    }
 }

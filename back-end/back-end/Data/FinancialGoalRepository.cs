@@ -40,4 +40,14 @@ public class FinancialGoalRepository
 
         return await query.ToListAsync();
     }
+
+    public async Task<FinancialGoal> GetById(int id, string username)
+    {
+        return await _context.FinancialGoals.FirstOrDefaultAsync(f => f.Id == id && f.User.Username == username);
+    }
+
+    public async Task SaveChanges()
+    {
+        await _context.SaveChangesAsync();
+    }
 }
