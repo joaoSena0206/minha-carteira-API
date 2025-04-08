@@ -35,4 +35,9 @@ public class FinancialGoalService
         
         return await _financialGoalRepository.Create(financialGoal);
     }
+
+    public async Task<List<FinancialGoal>> GetAll(int? month, int? year, string username)
+    {
+        return await _financialGoalRepository.GetAll(month, year, username);
+    }
 }

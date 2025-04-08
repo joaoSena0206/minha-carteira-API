@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace back_end.Models;
 
@@ -17,6 +18,7 @@ public class FinancialGoal
     [Required]
     public int Year { get; set; }
     
+    [JsonIgnore]
     public User User { get; set; } = new User();
     public Category Category { get; set; } = new Category();
 }

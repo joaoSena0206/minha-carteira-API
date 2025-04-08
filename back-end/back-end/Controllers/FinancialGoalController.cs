@@ -27,4 +27,14 @@ public class FinancialGoalController : ControllerBase
         
         return StatusCode(201, new { financialGoalId = id });
     }
+
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> GetAll([FromQuery] int? year, [FromQuery] int? month)
+    {
+        string username = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        List<FinancialGoal> financialGoals = await _financialGoalService.GetAll(month, year, username);
+        
+        return Ok(financialGoals);
+    }
 }
