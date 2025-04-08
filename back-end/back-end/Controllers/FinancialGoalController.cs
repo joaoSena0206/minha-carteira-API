@@ -33,7 +33,7 @@ public class FinancialGoalController : ControllerBase
     public async Task<IActionResult> GetAll([FromQuery] int? year, [FromQuery] int? month)
     {
         string username = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        List<FinancialGoal> financialGoals = await _financialGoalService.GetAll(month, year, username);
+        List<ShowFinancialGoalDto> financialGoals = await _financialGoalService.GetAll(month, year, username);
         
         return Ok(financialGoals);
     }

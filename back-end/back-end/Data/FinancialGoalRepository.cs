@@ -21,24 +21,29 @@ public class FinancialGoalRepository
         return financialGoal.Id;
     }
 
-    public async Task<List<FinancialGoal>> GetAll(int? month, int? year, string username)
+    public async Task<List<FinancialGoalWithTransactionsDto>> GetAll(int? month, int? year, string username)
     {
-        var query = _context.FinancialGoals
-            .Where(f => f.User.Username == username)
-            .Include(f => f.Category)
-            .AsQueryable();
-
-        if (month != null)
-        {
-            query = query.Where(f => f.Month == month);
-        }
-
-        if (year != null)
-        {
-            query = query.Where(f => f.Year == year);
-        }
-
-        return await query.ToListAsync();
+        List<FinancialGoalWithTransactionsDto> financialGoals = await _context.FinancialGoals
+            .Where(f => f.User.Username == username &&
+                        (month == null || f.Month == month) &&
+                        (year == null || f.Year == year))
+            .Select(f => new FinancialGoalWithTransactionsDto
+            {
+                Id = f.Id,
+                Month = f.Month,
+                Year = f.Year,
+                ValueLimit = f.ValueLimit,
+                Category = f.Category,
+                Transactions = f.Category.Transactions
+                    .Where(t =>
+                        t.Date.Month == f.Month &&
+                        t.Date.Year == f.Year &&
+                        t.IsCredit == false)
+                    .ToList()
+            })
+            .ToListAsync();
+        
+        return financialGoals;
     }
 
     public async Task<FinancialGoal> GetById(int id, string username)

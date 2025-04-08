@@ -10,15 +10,18 @@ public class FinancialGoalService
     private readonly FinancialGoalRepository _financialGoalRepository;
     private readonly CategoryRepository _categoryRepository;
     private readonly UserRepository _userRepository;
+    private readonly TransactionRepository _transactionRepository;
 
     public FinancialGoalService(
         FinancialGoalRepository financialGoalRepository,
         CategoryRepository categoryRepository,
-        UserRepository userRepository)
+        UserRepository userRepository,
+        TransactionRepository transactionRepository)
     {
         _financialGoalRepository = financialGoalRepository;
         _categoryRepository = categoryRepository;
         _userRepository = userRepository;
+        _transactionRepository = transactionRepository;
     }
 
     public async Task<int> Create(AddFinancialGoalDto financialGoalDto, string username)
@@ -36,9 +39,31 @@ public class FinancialGoalService
         return await _financialGoalRepository.Create(financialGoal);
     }
 
-    public async Task<List<FinancialGoal>> GetAll(int? month, int? year, string username)
+    public async Task<List<ShowFinancialGoalDto>> GetAll(int? month, int? year, string username)
     {
-        return await _financialGoalRepository.GetAll(month, year, username);
+        List<FinancialGoalWithTransactionsDto> financialGoalsWithTransactions = await _financialGoalRepository.GetAll(month, year, username);
+        List<ShowFinancialGoalDto> financialGoalsWithStatus = new List<ShowFinancialGoalDto>();
+
+        foreach (var financialGoal in financialGoalsWithTransactions)
+        {
+            decimal valueSpent = financialGoal.Transactions.Sum(t => t.Value);
+            string status = valueSpent > financialGoal.ValueLimit ? "estourado" : "ok";
+
+            var financialGoalWithStatus = new ShowFinancialGoalDto
+            {
+                Id = financialGoal.Id,
+                Month = financialGoal.Month,
+                Year = financialGoal.Year,
+                ValueLimit = financialGoal.ValueLimit,
+                SpentValue = valueSpent,
+                Status = status,
+                Category = financialGoal.Category,
+            };
+            
+            financialGoalsWithStatus.Add(financialGoalWithStatus);
+        }
+
+        return financialGoalsWithStatus;
     }
 
     public async Task Update(UpdateFinancialGoalDto financialGoalDto, string username, int id)
